@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = mode => ({
   cache: true,
@@ -27,6 +28,7 @@ module.exports = mode => ({
   },
   plugins: mode === 'development' ? [
     new webpack.HotModuleReplacementPlugin(),
+    new MonacoWebpackPlugin(),
   ] : [],
   devServer: {
     hot: true,

@@ -6,6 +6,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="/index.css">
+  <script src="/node_modules/monaco-editor/min/vs/loader.js"></script>
   <script src="/assets/shared-code-editor.bundle.js"></script>
   <title>Shared Code Editor</title>
 </head>
@@ -18,7 +19,20 @@
   </div>
   <script>
     // Do something.
-    const editor = new SharedCodeEditor();
+    const sce = {};
+    function initMonaco() {
+      require.config({ paths: { 'vs': '/node_modules/monaco-editor/min/vs' } });
+      require(['vs/editor/editor.main'], function () {
+        sce.editor = monaco.editor.create(document.getElementById('editor'), {});
+        onLoadMonaco();
+      });
+    }
+    function onLoadMonaco() {
+      sce.sceditor = new SharedCodeEditor(sce.editor);
+      sce.editor.setValue('asdf');
+    }
+
+    initMonaco();
   </script>
 </body>
 

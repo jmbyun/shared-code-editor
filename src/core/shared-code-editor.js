@@ -14,8 +14,9 @@ export default class SharedCodeEditor {
   }
   
   bindEditorListeners() {
-    this.editor.onDidChangeCursorPosition(this.handleCursorChange)
-    this.editor.onDidChangeModelContent(this.handleChange)
+    this.lastValue = this.editor.getValue();
+    this.editor.onDidChangeModelContent(this.handleChange);
+    this.editor.onDidChangeCursorPosition(this.handleCursorChange);
   }
 
   handleCursorChange = e => {
@@ -34,11 +35,6 @@ export default class SharedCodeEditor {
   };
 
   handleChange = e => {
-    console.log(
-      'Change',
-      e.changes
-    );
-
     const changes = e.changes.slice(0);
     changes.sort((a, b) => a.rangeOffset > b.rangeOffset ? 1 : -1);
 
@@ -49,19 +45,19 @@ export default class SharedCodeEditor {
       if (0 < offset) {
         op.push(offset);
       }
-      
+
+      if (change.rangeLength > 0) {
+        op.push({ d: this.lastValue.substr(change.rangeOffset, change.rangeLength) });
+      }
+      if (change.text.length > 0) {
+        op.push(change.text);
+      }
+      pos = change.rangeOffset + change.rangeLength;
     }
-    // e.changes
 
-    // change.range
-    // change.range.startColumn startLineNumber endColumn endLineNumber
-    // change.rangeLength
-    // change.rangeOffset
-    // text
-
-    // { type: "WRITE_NOTI", client: [14928, "qub3qM4h"], version: 14, op: [8, "f", 8, "f"] }
-    // { type: "WRITE_NOTI", client: [14928, "qub3qM4h"], version: 15, op: [3, { d: "oe" }, 5, { d: "t neas" }] }
-
+    this.lastValue = this.editor.getValue();
+    this.dispatch('change', { op });
+    // console.log('op', op);
   };
 
   on = (type, listener) => {

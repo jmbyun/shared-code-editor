@@ -6,6 +6,7 @@ export default class SharedCodeEditor {
   constructor(editor, options) {
     this.eventTarget = new EventTarget();
     this.editor = editor;
+    this.model = editor.getModel();
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -20,18 +21,16 @@ export default class SharedCodeEditor {
   }
 
   handleCursorChange = e => {
-    console.log(
-      'Cursor Change',
-      `position: ${e.position.lineNumber}, ${e.position.column}`,
-      `morePositions: ${e.secondaryPositions}`,
-    );
-    this.dispatch('cursorChange', {
-      position: [e.position.lineNumber, e.position.column],
-      positions: [
-        [e.position.lineNumber, e.position.column],
-        ...e.secondaryPositions.map(pos => [pos.lineNumber, pos.column]),
-      ],
+    const selections = this.editor.getSelections().map(selection => {
+      const offsets = [
+        this.model.getOffsetAt(selection.getStartPosition()),
+        this.model.getOffsetAt(selection.getEndPosition()),
+      ];
+      offsets.sort();
+      return offsets;
     });
+    this.dispatch('cursorChange', { selections });
+    console.log('cursorChange', selections);
   };
 
   handleChange = e => {
@@ -57,7 +56,7 @@ export default class SharedCodeEditor {
 
     this.lastValue = this.editor.getValue();
     this.dispatch('change', { op });
-    // console.log('op', op);
+    console.log('change', op);
   };
 
   on = (type, listener) => {

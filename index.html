@@ -21,15 +21,31 @@
     // Do something.
     const sce = {};
     function initMonaco() {
-      require.config({ paths: { 'vs': '/node_modules/monaco-editor/min/vs' } });
+      require.config({ paths: { vs: '/node_modules/monaco-editor/min/vs' } });
       require(['vs/editor/editor.main'], function () {
         sce.editor = monaco.editor.create(document.getElementById('editor'), {});
         onLoadMonaco();
       });
+      sce.ops = [];
     }
     function onLoadMonaco() {
       sce.sceditor = new SharedCodeEditor(sce.editor);
-      sce.sceditor.setValue('asdf');
+      sce.sceditor.on('change',e => {
+        sce.ops.push(e.detail.op);
+      });
+      sce.sceditor.setValue('print("hello world")');
+    }
+
+    function applyPreOps(ops) {
+      if (ops.length > 0) {
+        sce.sceditor.apply(ops[0])
+        setTimeout(() => applyPreOps(ops.slice(1)), 500);
+      }
+    }
+    const ops = [["print(\"hello world\")"], [20, "\n"], [21, "\n"], [22, "#"], [23, " "], [24, "H"], [25, "e"], [26, "l"], [27, "l"], [28, "o"], [29, " "], [30, "t"], [31, "h"], [32, "e"], [33, "r"], [34, "e"], [35, "!"]];
+
+    function setCursor() {
+      sce.sceditor.setCursor('aaa', 1, 5, { title: 'User' });
     }
 
     initMonaco();

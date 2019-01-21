@@ -1,3 +1,6 @@
+import classnames from 'classnames';
+import './shared-code-editor.css';
+
 const DEFAULT_OPTIONS = {
 
 };
@@ -7,6 +10,7 @@ export default class SharedCodeEditor {
     this.eventTarget = new EventTarget();
     this.editor = editor;
     this.model = editor.getModel();
+    this.cursors = {};
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -34,7 +38,7 @@ export default class SharedCodeEditor {
   };
 
   handleChange = e => {
-    const changes = e.changes.slice(0);
+    const changes = (e.changes || []).slice(0);
     changes.sort((a, b) => a.rangeOffset > b.rangeOffset ? 1 : -1);
 
     const op = [];
@@ -59,17 +63,87 @@ export default class SharedCodeEditor {
     console.log('change', op);
   };
 
-  on = (type, listener) => {
-    this.eventTarget.addEventListener(type, listener);
-  };
-
   dispatch = (typeArg, detail, cancelable) => {
     const event = new Event(typeArg, cancelable ? { cancelable: true } : {});
     Object.assign(event, { detail });
     return this.eventTarget.dispatchEvent(event);
   };
 
+  // Public methods below.
+
+  on(type, listener) {
+    this.eventTarget.addEventListener(type, listener);
+  }
+
   setValue(newValue) {
     this.editor.setValue(newValue);
+  }
+
+  apply(op) {
+    let pos = 0;
+    for (const ot of op) {
+      switch (typeof ot) {
+        case 'object':
+          const startPosition = this.model.getPositionAt(pos);
+          const endPosition = this.model.getPositionAt(pos + ot.d.length);
+          this.model.applyEdits([
+            {
+              range: {
+                startColumn: startPosition.column,
+                startLineNumber: startPosition.lineNumber,
+                endColumn: endPosition.column,
+                endLineNumber: endPosition.lineNumber,
+              },
+              text: null,
+            }
+          ]);
+          break;
+        case 'string':
+          const position = this.model.getPositionAt(pos);
+          this.model.applyEdits([
+            {
+              range: {
+                startColumn: position.column,
+                startLineNumber: position.lineNumber,
+                endColumn: position.column,
+                endLineNumber: position.lineNumber,
+              },
+              text: ot,
+            },
+          ]);
+          break;
+        case 'number':
+          pos += ot;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  setCursor(id, startOffset, endOffset, options = {}) {
+    const oldDecorations = [];
+    if (this.cursors[id]) {
+      oldDecorations.push(id);
+      delete this.cursors[id];
+    }
+    const className = 'SharedCodeEditor-cursor';
+    const startPosition = this.model.getPositionAt(startOffset);
+    const endPosition = this.model.getPositionAt(endOffset);
+    const decorations = [
+      {
+        options: {
+          className: `${className} ${className}--${id}`,
+          hoverMessage: options.title || undefined,
+        },
+        range: {
+          startColumn: startPosition.column,
+          startLineNumber: startPosition.lineNumber,
+          endColumn: endPosition.column,
+          endLineNumber: endPosition.lineNumber,
+        },
+      },
+    ];
+    this.editor.deltaDecorations(oldDecorations, decorations)
   }
 }

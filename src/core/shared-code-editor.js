@@ -11,6 +11,8 @@ export default class SharedCodeEditor {
     this.editor = editor;
     this.model = editor.getModel();
     this.cursors = {};
+    this.cursorTags = {};
+    this.cursorTagElements = {};
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -144,6 +146,33 @@ export default class SharedCodeEditor {
         },
       },
     ];
-    this.editor.deltaDecorations(oldDecorations, decorations)
+    this.editor.deltaDecorations(oldDecorations, decorations);
+
+    const tagWidget = {
+      domNode: null,
+      getId: () => id,
+      getDomNode: () => {
+        const el = document.createElement('div');
+        el.innerHTML = options.title || 'User';
+        el.className = 'SharedCodeEditor-cursor-tag';
+        this.cursorTagElements[id] = el;
+      },
+      getPosition: () => ({
+        position: {
+          column: endPosition.column,
+          lineNumber: endPosition.lineNumber,
+        },
+        preference: [
+          monaco.editor.ContentWidgetPositionPreference.ABOVE, 
+          monaco.editor.ContentWidgetPositionPreference.BELOW,
+        ],
+      }),
+    };
+    if (this.cursorTags[id]) {
+      this.editor.layoutContentWidget(tagWidget);
+    } else {
+      this.editor.addContentWidget(tagWidget);
+    }
+    
   }
 }

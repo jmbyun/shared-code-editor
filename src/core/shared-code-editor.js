@@ -126,27 +126,27 @@ export default class SharedCodeEditor {
   setCursor(id, startOffset, endOffset, options = {}) {
     const oldDecorations = [];
     if (this.cursors[id]) {
-      oldDecorations.push(id);
+      oldDecorations.push(this.cursors[id]);
       delete this.cursors[id];
     }
     const className = 'SharedCodeEditor-cursor';
     const startPosition = this.model.getPositionAt(startOffset);
     const endPosition = this.model.getPositionAt(endOffset);
-    const decorations = [
-      {
-        options: {
-          className: `${className} ${className}--${id}`,
-          hoverMessage: options.title || undefined,
-        },
-        range: {
-          startColumn: startPosition.column,
-          startLineNumber: startPosition.lineNumber,
-          endColumn: endPosition.column,
-          endLineNumber: endPosition.lineNumber,
-        },
+    const decoration = {
+      options: {
+        className: `${className} ${className}--${id}`,
+        hoverMessage: options.title || undefined,
       },
-    ];
-    this.editor.deltaDecorations(oldDecorations, decorations);
+      range: {
+        startColumn: startPosition.column,
+        startLineNumber: startPosition.lineNumber,
+        endColumn: endPosition.column,
+        endLineNumber: endPosition.lineNumber,
+      },
+    };
+    const decorations = [decoration];
+    const decorationIds = this.editor.deltaDecorations(oldDecorations, decorations);
+    this.cursors[id] = decorationIds[0];
 
     const tagWidget = {
       domNode: null,
@@ -156,6 +156,7 @@ export default class SharedCodeEditor {
         el.innerHTML = options.title || 'User';
         el.className = 'SharedCodeEditor-cursor-tag';
         this.cursorTagElements[id] = el;
+        return el;
       },
       getPosition: () => ({
         position: {
@@ -173,6 +174,6 @@ export default class SharedCodeEditor {
     } else {
       this.editor.addContentWidget(tagWidget);
     }
-    
+    this.cursorTags[id] = tagWidget;
   }
 }

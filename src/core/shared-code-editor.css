@@ -1,3 +1,13 @@
 .SharedCodeEditor-cursor {
   background-color: rgba(0, 0, 255, 0.3);
 }
+
+.SharedCodeEditor-cursor-tag {
+  min-width: none;
+  min-height: none;
+  padding: 0.125rem 0.25rem;
+  background-color: rgba(0, 0, 255, 0.3);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  word-break: keep-all;
+}

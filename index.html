@@ -52,6 +52,9 @@
           sce.sceditor.setCursor('aaa', 1, 3, { title: 'Monaco' });
           setTimeout(() => {
             sce.sceditor.setCursor('aaa', 1, 2, { title: 'Monaco' });
+            setTimeout(() => {
+              sce.sceditor.removeCursor('aaa');
+            }, 500);    
           }, 500);
         }, 500);
       }, 500);

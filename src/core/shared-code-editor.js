@@ -176,4 +176,17 @@ export default class SharedCodeEditor {
     }
     this.cursorTags[id] = tagWidget;
   }
+
+  removeCursor(id) {
+    const oldDecorations = [];
+    if (this.cursors[id]) {
+      oldDecorations.push(this.cursors[id]);
+      delete this.cursors[id];
+    }
+    this.editor.deltaDecorations(oldDecorations, []);
+    if (this.cursorTags[id]) {
+      const tagWidget = this.cursorTags[id];
+      this.editor.removeContentWidget(tagWidget);
+    }
+  }
 }

@@ -2,7 +2,7 @@
   "name": "shared-code-editor",
   "version": "1.0.0",
   "description": "A web code editor wrapper that supports OTs and multiple cursors.",
-  "main": "dist/shared-code-editor.esm.js",
+  "main": "lib/shared-code-editor.js",
   "repository": "git@github.com:jmbyun/shared-code-editor.git",
   "author": "Jeongmin Byun <jmbyun91@gmail.com>",
   "license": "MIT",

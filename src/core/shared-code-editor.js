@@ -129,9 +129,15 @@ export default class SharedCodeEditor {
       oldDecorations.push(this.cursors[id]);
       delete this.cursors[id];
     }
-    const className = 'SharedCodeEditor-cursor';
     const startPosition = this.model.getPositionAt(startOffset);
     const endPosition = this.model.getPositionAt(endOffset);
+    let className = 'SharedCodeEditor-cursor-block';
+    if (
+      (startPosition.column === endPosition.column) &&
+      (startPosition.lineNumber === endPosition.lineNumber)
+    ) {
+      className = 'SharedCodeEditor-cursor';
+    }
     const decoration = {
       options: {
         className: `${className} ${className}--${id}`,
@@ -186,7 +192,21 @@ export default class SharedCodeEditor {
     this.editor.deltaDecorations(oldDecorations, []);
     if (this.cursorTags[id]) {
       const tagWidget = this.cursorTags[id];
+      delete this.cursorTags[id];
       this.editor.removeContentWidget(tagWidget);
     }
+  }
+
+  clearCursor() {
+    Object.keys(this.cursors).forEach(id => {
+      const oldDecorations = [this.cursors[id]];
+      delete this.cursors[id]
+      this.editor.deltaDecorations(oldDecorations, []);
+      if (this.cursorTags[id]) {
+        const tagWidget = this.cursorTags[id];
+        delete this.cursorTags[id];
+        this.editor.removeContentWidget(tagWidget);
+      }
+    });
   }
 }

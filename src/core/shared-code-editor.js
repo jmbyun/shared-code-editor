@@ -131,12 +131,15 @@ export default class SharedCodeEditor {
     }
     const startPosition = this.model.getPositionAt(startOffset);
     const endPosition = this.model.getPositionAt(endOffset);
+    const color = options.color || 'rgba(0, 0, 255, 0.3)';
     let className = 'SharedCodeEditor-cursor-block';
+    let style = `background-color: ${color};`;
     if (
       (startPosition.column === endPosition.column) &&
       (startPosition.lineNumber === endPosition.lineNumber)
     ) {
       className = 'SharedCodeEditor-cursor';
+      style = `box-shadow: inset 2px 0px 0px 0px ${color};`;
     }
     const decoration = {
       options: {
@@ -153,6 +156,11 @@ export default class SharedCodeEditor {
     const decorations = [decoration];
     const decorationIds = this.editor.deltaDecorations(oldDecorations, decorations);
     this.cursors[id] = decorationIds[0];
+    // TODO: Fix cursor color setting to be robust.
+    setTimeout(() => {
+      const el = document.getElementsByClassName(`${className}--${id}`)[0];
+      el.style.cssText = style;
+    }, 100);
 
     const tagWidget = {
       domNode: null,
@@ -161,6 +169,7 @@ export default class SharedCodeEditor {
         const el = document.createElement('div');
         el.innerHTML = options.title || 'User';
         el.className = 'SharedCodeEditor-cursor-tag';
+        el.style.cssText = `background-color: ${color};`;
         this.cursorTagElements[id] = el;
         return el;
       },

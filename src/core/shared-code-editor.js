@@ -77,6 +77,10 @@ export default class SharedCodeEditor {
     this.eventTarget.addEventListener(type, listener);
   }
 
+  off(type, listener) {
+    this.eventTarget.removeEventListener(type, listener);
+  }
+
   setValue(newValue) {
     this.editor.setValue(newValue);
   }

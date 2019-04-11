@@ -16,8 +16,13 @@ gulp.task('build-webpack', callback => {
   });
 });
 
+gulp.task('build-copy', () => {
+  return gulp.src(['src/**/*', '!src/**/*.js'])
+    .pipe(gulp.dest('lib'));
+})
+
 gulp.task('build-babel', () => {
-  return gulp.src(['src/**/*', '!src/browser.js'])
+  return gulp.src(['src/**/*.js', '!src/browser.js'])
     .pipe(babel())
     .pipe(gulp.dest('lib'));
 });
@@ -39,4 +44,4 @@ gulp.task('dev-webpack', () => {
 });
 
 gulp.task('dev', ['dev-webpack']);
-gulp.task('build', ['build-babel', 'build-webpack']);
+gulp.task('build', ['build-babel', 'build-copy', 'build-webpack']);

@@ -29,7 +29,18 @@
       sce.ops = [];
     }
     function onLoadMonaco() {
-      sce.sceditor = new SharedCodeEditor(sce.editor);
+      sce.sceditor = new SharedCodeEditor(sce.editor, {
+        getBlockTag: () => {
+          const el = document.createElement('div');
+          el.innerHTML = 'Go to Google';
+          el.className = 'editor-block-tag';
+          el.style.cssText = `cursor: pointer;`;
+          el.onclick = () => {
+            window.location.href = 'https://www.google.com';
+          };
+          return el;
+        }
+      });
       sce.sceditor.on('change',e => {
         sce.ops.push(e.detail.op);
       });

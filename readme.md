@@ -42,7 +42,8 @@ The easiest way to use SharedCodeEditor is to simply load the bundle script unde
 Having this script tag, a shared code editor instance can be created like this:
 
 ```javascript
-var editor = monaco.editor.create(document.getElementById('editor'), {});
+var options = {};
+var editor = monaco.editor.create(document.getElementById('editor'), options);
 var sceditor = new SharedCodeEditor(editor);
 ```
 
@@ -59,3 +60,33 @@ import Elixercise from 'shared-code-editor/lib/shared-code-editor.js';
 ```
 
 For a working example, run `$ yarn start` script and check out the example web page. This shows the `./index.html` file rendered on the browser with all dependencies ready.
+
+### Options
+
+Following options are available on SharedCodeEditor. 
+
+#### getBlockTag
+
+This option allows you to show a DOM element next to the user selection
+on the editor. In other words, if the user selects multiple characters on the
+editor with the cursor, a DOM element will show up next to the cursor.
+
+To use this feature, you need to pass a function that returns the DOM element
+that you want to show next to the cursor.
+
+*Example*
+
+```javascript
+var options = {
+  getBlockTag: () => {
+    const el = document.createElement('div');
+    el.innerHTML = 'Go to Google';
+    el.className = 'editor-block-tag';
+    el.style.cssText = `cursor: pointer;`;
+    el.onclick = () => {
+      window.location.href = 'https://www.google.com';
+    };
+    return el;
+  },
+};
+```

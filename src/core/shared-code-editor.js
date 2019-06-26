@@ -35,9 +35,45 @@ export default class SharedCodeEditor {
       offsets.sort();
       return offsets;
     });
+    if (selections[0][0] !== selections[0][1]) {
+      this.showBlockTag(this.editor.getSelections()[0].getEndPosition());
+    } else {
+      this.hideBlockTag();
+    }
     this.dispatch('cursorChange', { selections });
     console.log('cursorChange', selections);
   };
+
+  showBlockTag(position) {
+    if (!this.options.getBlockTag) {
+      return;
+    }
+    const tagWidget = {
+      domNode: null,
+      getId: () => 'blockTag',
+      getDomNode: this.options.getBlockTag,
+      getPosition: () => ({
+        position,
+        preference: [
+          monaco.editor.ContentWidgetPositionPreference.ABOVE,
+          monaco.editor.ContentWidgetPositionPreference.BELOW,
+        ],
+      })
+    };
+    if (this.blockTag) {
+      this.editor.layoutContentWidget(tagWidget);
+    } else {
+      this.editor.addContentWidget(tagWidget);
+    }
+    this.blockTag = tagWidget;
+  }
+
+  hideBlockTag() {
+    if (this.blockTag) {
+      this.editor.removeContentWidget(this.blockTag);
+    }
+    this.blockTag = null;
+  }
 
   handleChange = e => {
     const changes = (e.changes || []).slice(0);

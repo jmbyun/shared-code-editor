@@ -22,7 +22,7 @@
     "babel-loader": "^8.0.4",
     "babel-polyfill": "^6.26.0",
     "bulma": "^0.7.2",
-    "codemirror": "^5.42.0",
+    "codemirror": "^5.58.2",
     "css-loader": "^2.1.0",
     "font-awesome": "^4.7.0",
     "gulp": "^3.9.1",
